@@ -226,6 +226,23 @@ def test_get_folder_path_with_location():
 
     assert path == os.path.join('2015-12-Dec','Sunnyvale'), path
 
+@mock.patch('elodie.config.config_file', '%s/config.ini-original-with-camera-make-and-model' % gettempdir())
+def test_get_folder_path_with_camera_make_and_model():
+    with open('%s/config.ini-original-with-camera-make-and-model' % gettempdir(), 'w') as f:
+        f.write("""
+[Directory]
+full_path=%camera_make/%camera_model
+        """)
+    if hasattr(load_config, 'config'):
+        del load_config.config
+    filesystem = FileSystem()
+    media = Photo(helper.get_file('plain.jpg'))
+    path = filesystem.get_folder_path(media.get_metadata())
+    if hasattr(load_config, 'config'):
+        del load_config.config
+
+    assert path == os.path.join('Canon', 'Canon EOS REBEL T2i'), path
+
 @mock.patch('elodie.config.config_file', '%s/config.ini-original-default-unknown-location' % gettempdir())
 def test_get_folder_path_with_original_default_unknown_location():
     with open('%s/config.ini-original-default-with-unknown-location' % gettempdir(), 'w') as f:
